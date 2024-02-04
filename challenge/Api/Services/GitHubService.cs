@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace GitHubRepoApi3.Services
 {
@@ -17,7 +18,7 @@ namespace GitHubRepoApi3.Services
 
             httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("GitHubRepoApi3");
 
-            var url = "https://api.github.com/orgs/takenet/repos?per_page=100";
+            var url = "https://api.github.com/orgs/takenet/repos";
             var response = await httpClient.GetAsync(url);
             var repositories = await response.Content.ReadFromJsonAsync<IEnumerable<Repository>>();
 
@@ -59,18 +60,57 @@ namespace GitHubRepoApi3.Services
 
     public class Repository
     {
+        public long Id { get; set; }
+        [JsonPropertyName("node_id")]
+        public string NodeId { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
-        public string Language { get; set; }
-        public DateTime CreatedAt { get; set; }
+        [JsonPropertyName("full_name")]
+        public string FullName { get; set; }
+        public bool Private { get; set; }
         public Owner Owner { get; set; }
         [JsonPropertyName("html_url")]
         public string HtmlUrl { get; set; }
+        public string Description { get; set; }
+        public bool Fork { get; set; }
+        public string Url { get; set; }
+        [JsonPropertyName("forks_url")]
+        public string ForksUrl { get; set; }
+        [JsonPropertyName("created_at")]
+        public DateTime CreatedAt { get; set; }
+        [JsonPropertyName("updated_at")]
+        public DateTime UpdatedAt { get; set; }
+        [JsonPropertyName("pushed_at")]
+        public DateTime PushedAt { get; set; }
+        public string Language { get; set; }
+        public License License { get; set; }
+        public bool Archived { get; set; }
+        public bool Disabled { get; set; }
+        [JsonPropertyName("open_issues_count")]
+        public int OpenIssuesCount { get; set; }
     }
 
     public class Owner
     {
+        [JsonPropertyName("login")]
+        public string Login { get; set; }
+        public long Id { get; set; }
+        [JsonPropertyName("node_id")]
+        public string NodeId { get; set; }
+        [JsonPropertyName("avatar_url")]
         public string AvatarUrl { get; set; }
+        [JsonPropertyName("html_url")]
+        public string HtmlUrl { get; set; }
+    }
+
+    public class License
+    {
+        public string Key { get; set; }
+        public string Name { get; set; }
+        [JsonPropertyName("spdx_id")]
+        public string SpdxId { get; set; }
+        public string Url { get; set; }
+        [JsonPropertyName("node_id")]
+        public string NodeId { get; set; }
     }
 
     public class ApiResponse
