@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using Newtonsoft.Json;
 using System.Text.Json.Serialization;
 
 namespace GitHubRepoApi3.Services
@@ -14,52 +14,91 @@ namespace GitHubRepoApi3.Services
 
         public async Task<ApiResponse> GetFormattedRepositoriesAsync()
         {
-            var httpClient = _httpClientFactory.CreateClient();
-
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("GitHubRepoApi3");
-
-            var url = "https://api.github.com/orgs/takenet/repos";
-            var response = await httpClient.GetAsync(url);
-            var repositories = await response.Content.ReadFromJsonAsync<IEnumerable<Repository>>();
-
-            var formattedResponse = new ApiResponse();
-
-            foreach (var repo in repositories.Where(r => r.Language == "C#").OrderBy(r => r.CreatedAt).Take(5))
+            try
             {
-                formattedResponse.Content.Items.Add(new ApiResponseItem
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("GitHubRepoApi3");
+
+                var url = "https://api.github.com/orgs/takenet/repos";
+                HttpResponseMessage response = null;
+                const int maxTentativas = 3;
+                int tentativaAtual = 0;
+                bool requestSucesso = false;
+
+                while (tentativaAtual < maxTentativas && !requestSucesso)
                 {
-                    Header = new ApiResponseHeader
+                    response = await httpClient.GetAsync(url);
+                    tentativaAtual++;
+
+                    if (response.IsSuccessStatusCode)
                     {
-                        Value = new ApiResponseValue
-                        {
-                            Title = repo.Name,
-                            Text = repo.Description,
-                            Uri = "https://github.com/moacyrrln/blip/blob/master/images/take.jpg?raw=true"
-                        }
-                    },
-                    Options = new List<ApiResponseOptions>()
+                        requestSucesso = true;
+                    }
+                    else
                     {
-                        new ApiResponseOptions
+                        await Task.Delay(3000);
+                    }
+                }
+
+                if (!requestSucesso)
+                {
+                    throw new InvalidOperationException("Falha ao obter resposta bem-sucedida da API do GitHub após várias tentativas.");
+                }
+
+                var repositories = await response.Content.ReadFromJsonAsync<IEnumerable<Repository>>();
+
+                var formattedResponse = new ApiResponse();
+
+                foreach (var repo in repositories.Where(r => r.Language == "C#").OrderBy(r => r.CreatedAt).Take(5))
+                {
+                    formattedResponse.Content.Items.Add(new ApiResponseItem
+                    {
+                        Header = new ApiResponseHeader
                         {
-                            Label = new ApiResponseLink
-                                {
-                                    Value = new LinkValue
-                                    {
-                                        Title = repo.Name,
-                                        Uri = repo.HtmlUrl
-                                    }
-                                }
+                            Value = new ApiResponseValue
+                            {
+                                Title = repo.Name,
+                                Text = repo.Description,
+                                Uri = "https://github.com/moacyrrln/blip/blob/master/images/take.jpg?raw=true"
+                            }
+                        },
+                        Options = new List<ApiResponseOptions>()
+                {
+                    new ApiResponseOptions
+                    {
+                        Label = new ApiResponseLink
+                        {
+                            Value = new LinkValue
+                            {
+                                Title = repo.Name,
+                                Uri = repo.HtmlUrl
+                            }
                         }
                     }
-                });
-            }
+                }
+                    });
+                }
 
-            return formattedResponse;
+                return formattedResponse;
+            }
+            catch (HttpRequestException e)
+            {
+                throw new ApplicationException("Erro na requisição HTTP: " + e.Message);
+            }
+            catch (JsonException e)
+            {
+                throw new ApplicationException("Erro ao desserializar a resposta JSON: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new ApplicationException("Erro inesperado: " + e.Message);
+            }
         }
     }
 
     public class Repository
     {
+        [JsonPropertyName("id")]
         public long Id { get; set; }
         [JsonPropertyName("node_id")]
         public string NodeId { get; set; }
