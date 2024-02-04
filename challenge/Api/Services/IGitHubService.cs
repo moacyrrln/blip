@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace GitHubRepoApi.Services
+﻿namespace GitHubRepoApi3.Services
 {
     public interface IGitHubService
     {

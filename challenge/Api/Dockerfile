@@ -1,3 +1,4 @@
+# E:\Blip\API\GitHubRepoApi\Dockerfile
 # Use the official ASP.NET Core runtime image as the base image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
@@ -11,17 +12,17 @@ WORKDIR /src
 COPY . ./src
 
 # Execute o comando dotnet restore para restaurar as dependências
-RUN dotnet restore "src/GitHubRepoApi.csproj"
+RUN dotnet restore "src/GitHubRepoApi3.csproj"
 
 # Continuar com as etapas de construção
 WORKDIR /src
-RUN dotnet build "src/GitHubRepoApi.csproj" -c Release -o /app/build
+RUN dotnet build "src/GitHubRepoApi3.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "src/GitHubRepoApi.csproj" -c Release -o /app/publish
+RUN dotnet publish "src/GitHubRepoApi3.csproj" -c Release -o /app/publish
 
 # Create the final image
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "GitHubRepoApi.dll"]
+ENTRYPOINT ["dotnet", "GitHubRepoApi3.dll"]

@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using GitHubRepoApi.Services;
+﻿using GitHubRepoApi3.Services;
+using Microsoft.AspNetCore.Mvc;
 
-namespace GitHubRepoApi.Controllers
+namespace GitHubRepoApi3.Controller
 {
     [ApiController]
     [Route("")]

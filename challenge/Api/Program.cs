@@ -1,20 +1,15 @@
+using GitHubRepoApi3.Services;
+
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddHttpClient();
 builder.Services.AddControllers();
-builder.Services.AddHttpClient<GitHubRepoApi.Services.IGitHubService, GitHubRepoApi.Services.GitHubService>();
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+builder.Services.AddScoped<IGitHubService, GitHubService>();
 var app = builder.Build();
-
-app.UseSwagger();
-app.UseSwaggerUI();
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+app.MapGet("/", () => "Hello World!");
 app.MapControllers();
 
 app.Run();
