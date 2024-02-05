@@ -1,9 +1,7 @@
-﻿using Xunit;
-using Moq;
+﻿using Moq;
 using GitHubRepoApi3.Services;
-using GitHubRepoApi3.Controller;
+using GitHubRepoApi3.Controllers;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace GitHubRepoApi3.Tests
 {

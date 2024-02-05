@@ -1,7 +1,7 @@
 ﻿using GitHubRepoApi3.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GitHubRepoApi3.Controller
+namespace GitHubRepoApi3.Controllers
 {
     [ApiController]
     [Route("")]
@@ -20,8 +20,8 @@ namespace GitHubRepoApi3.Controller
         {
             try
             {
-                var repositories = await _gitHubService.GetFormattedRepositoriesAsync();
-                return Ok(repositories);
+                var response = await _gitHubService.GetFormattedRepositoriesAsync();
+                return Ok(response);
             }
             catch (Exception ex)
             {
